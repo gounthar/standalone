@@ -21,7 +21,7 @@ services:
       - websocket
       - api
   adb:
-    image: gounthar/docker-adb:stretch
+    image: gounthar/docker-adb:aarch64
     restart: unless-stopped
     privileged: true
     volumes:
@@ -32,7 +32,7 @@ services:
     volumes:
       - rethinkdb:/data
   app:
-    image: gounthar/stf-armv7l
+    image: gounthar/stf-aarch64
     restart: unless-stopped
     environment:
       - RETHINKDB_PORT_28015_TCP
@@ -43,13 +43,13 @@ services:
       - auth
       - websocket
   auth:
-    image: gounthar/stf-armv7l
+    image: gounthar/stf-aarch64
     restart: unless-stopped
     environment:
       - SECRET
     command: stf auth-mock --app-url http://${PUBLIC_IP}/ --port 3000
   processor:
-    image: gounthar/stf-armv7l
+    image: gounthar/stf-aarch64
     restart: unless-stopped
     environment:
       - RETHINKDB_PORT_28015_TCP
@@ -59,22 +59,22 @@ services:
       - triproxy
       - dev-triproxy
   triproxy:
-    image: gounthar/stf-armv7l
+    image: gounthar/stf-aarch64
     restart: unless-stopped
     command: stf triproxy app --bind-pub "tcp://*:7150" --bind-dealer "tcp://*:7160" --bind-pull "tcp://*:7170"
   dev-triproxy:
-    image: gounthar/stf-armv7l
+    image: gounthar/stf-aarch64
     restart: unless-stopped
     command: stf triproxy dev --bind-pub "tcp://*:7250" --bind-dealer "tcp://*:7260" --bind-pull "tcp://*:7270"
   migrate:
-    image: gounthar/stf-armv7l
+    image: gounthar/stf-aarch64
     environment:
       - RETHINKDB_PORT_28015_TCP
     command: stf migrate
     depends_on:
       - rethinkdb
   provider:
-    image: gounthar/stf-armv7l
+    image: gounthar/stf-aarch64
     restart: unless-stopped
     command: stf provider --name ${STATION_NAME} --connect-sub tcp://dev-triproxy:7250 --connect-push tcp://dev-triproxy:7270 --storage-url http://${PUBLIC_IP}/ --public-ip ${PUBLIC_IP} --heartbeat-interval 10000 --screen-ws-url-pattern "ws://${PUBLIC_IP}/d/nuc/<%= serial %>/<%= publicPort %>/" --adb-host adb --min-port 7400 --max-port 7700
     ports:
@@ -85,7 +85,7 @@ services:
       - triproxy
       - storage-temp
   reaper:
-    image: gounthar/stf-armv7l
+    image: gounthar/stf-aarch64
     restart: unless-stopped
     environment:
       - RETHINKDB_PORT_28015_TCP
@@ -96,25 +96,25 @@ services:
       - triproxy
     command: stf reaper dev --connect-push tcp://dev-triproxy:7270 --connect-sub tcp://triproxy:7150 --heartbeat-timeout 30000
   storage-plugin-apk:
-    image: gounthar/stf-armv7l
+    image: gounthar/stf-aarch64
     restart: unless-stopped
     command: stf storage-plugin-apk --port 3000 --storage-url http://${PUBLIC_IP}/
     depends_on:
       - storage-temp
   storage-plugin-image:
-    image: gounthar/stf-armv7l
+    image: gounthar/stf-aarch64
     restart: unless-stopped
     command: stf storage-plugin-image --port 3000 --storage-url http://${PUBLIC_IP}/
     depends_on:
       - storage-temp
   storage-temp:
-    image: gounthar/stf-armv7l
+    image: gounthar/stf-aarch64
     restart: unless-stopped
     volumes:
       - storage-temp:/app/data
     command: stf storage-temp --port 3000 --save-dir /app/data
   websocket:
-    image: gounthar/stf-armv7l
+    image: gounthar/stf-aarch64
     restart: unless-stopped
     environment:
       - SECRET
@@ -127,7 +127,7 @@ services:
       - triproxy
       - dev-triproxy
   api:
-    image: gounthar/stf-armv7l
+    image: gounthar/stf-aarch64
     restart: unless-stopped
     environment:
       - SECRET
